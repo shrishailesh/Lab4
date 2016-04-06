@@ -44,6 +44,7 @@ protected:
 	static uint32_t  totalinfected;    // keeps count of total infected instances
 	static uint32_t  totalvulnerable;  // keeps count of total vulnerable instances
 	static uint32_t  totalinstances;
+        static uint32_t  scan_range;
 
 	WormTargetVector *targetV;
 	static WormTargetVector *defaultTV;
@@ -54,8 +55,7 @@ protected:
 public:
 
 	Worm(); // Constructor.
-	void SetNode (Ptr<Node> node); // Note which node attached to
-	Ptr<Node> GetNode () const;	
+	void SetNode (Ptr<Node> arg_node); // Note which node attached to
 	virtual ~Worm() {};
 	virtual Ptr<Application> Copy() const = 0;// Make a copy of the application
 	virtual void DoInitialize(void);
@@ -68,9 +68,9 @@ public:
 	static void SetInfectionPort(uint16_t);
 	static void SetTargetVector(const WormTargetVector &);
 	static void SetSignature(std::string s);
-	static uint32_t  TotalInfected() {return totalinfected;};
-	static uint32_t  TotalVulnerable() {return totalvulnerable;};
-	static uint32_t  TotalInstances() {return totalinstances;};
-	void SetStartTime (Time start);
-	void SetStopTime (Time stop);	
+	static uint32_t  TotalInfected() ;
+	static uint32_t  TotalVulnerable() ;
+	static uint32_t  TotalInstances() ;
+	//void SetStartTime (Time start);
+	//void SetStopTime (Time stop);	
 }
