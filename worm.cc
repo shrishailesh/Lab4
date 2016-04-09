@@ -183,7 +183,7 @@ Ipv4Address Worm::GenerateNextIPAddress() {
     if (!targetV) {
     	targetV = defaultTV->Copy();
 	Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-        Ipv4Address addr = ipv4->GetAddress(0,0);
+        Ipv4Address addr = ipv4->GetAddress(1,0);
     }
 
     IP = baseIP + targetV->Generate();
