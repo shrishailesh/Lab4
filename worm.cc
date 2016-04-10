@@ -65,28 +65,23 @@ void Worm::PrepareWormData(char *&buffer)
   strncpy(buffer, signature.c_str(), signature.length());
 }
 
-void Worm::Receive(Ptr<Packet> p, Ptr<IpL4Protocol> proto, uint32_t)
-{
-  delete p;
-}
-
-void Worm::ConnectionComplete(Ptr<IpL4Protocol> proto)
+void Worm::Receive(Ptr<Socket> proto, uint32_t)
 {
 }
 
-void Worm::Sent(uint32_t c, Ptr<IpL4Protocol> proto)
+void Worm::ConnectionSucceeded(Ptr<Socket> proto)
 {
 }
 
-void Worm::ConnectionFailed(Ptr<IpL4Protocol> proto, bool)
+void Worm::DataSend(Ptr<Socket> proto, uint32_t c)
 {
 }
 
-void Worm::CloseRequest(Ptr<IpL4Protocol> proto)
+void Worm::ConnectionFailed(Ptr<Socket> proto)
 {
 }
 
-void Worm::Closed(Ptr<IpL4Protocol> proto)
+void Worm::CloseRequest(Ptr<Socket> proto)
 {
 }
 

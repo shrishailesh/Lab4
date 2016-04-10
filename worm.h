@@ -6,8 +6,9 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
-#include "ip-l4-protocol.h"
+#include "socket.h"
 #include "WormTargetVector.h"
+#include "ns3/ptr.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -33,12 +34,11 @@ protected:
 	virtual void StartApplication (void);    // Called at time specified by Start
 	virtual void StopApplication (void);     // Called at time specified by Stop
 
-	virtual void Receive(Ptr<Packet>, Ptr<IpL4Protocol>, uint32_t); // Data received
-	virtual void Sent(uint32_t , Ptr<IpL4Protocol>); 
-	virtual void ConnectionComplete(Ptr<IpL4Protocol>);
-	virtual void ConnectionFailed(Ptr<IpL4Protocol>, bool);
-	virtual void CloseRequest(Ptr<IpL4Protocol>);
-	virtual void Closed(Ptr<IpL4Protocol>);
+	virtual void Receive(Ptr<Socket>, uint32_t); // Data received
+	virtual void DataSend(Ptr<Socket>, uint32_t); 
+	virtual void ConnectionSucceeded(Ptr<Socket>);
+	virtual void ConnectionFailed(Ptr<Socket>);
+	virtual void CloseRequest(Ptr<Socket>);
 
  private:
 	static uint32_t  totalinfected;    // keeps count of total infected instances

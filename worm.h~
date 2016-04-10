@@ -8,6 +8,7 @@
 #include "ns3/packet.h"
 #include "ip-l4-protocol.h"
 #include "WormTargetVector.h"
+#include "ns3/ptr.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -33,17 +34,17 @@ protected:
 	virtual void StartApplication (void);    // Called at time specified by Start
 	virtual void StopApplication (void);     // Called at time specified by Stop
 
-	virtual void Receive(Ptr<Packet>, Ptr<IpL4Protocol>, uint32_t); // Data received
-	virtual void Sent(Count_t , Ptr<IpL4Protocol>); 
-	virtual void ConnectionComplete(Ptr<IpL4Protocol>);
-	virtual void ConnectionFailed(Ptr<IpL4Protocol>, bool);
-	virtual void CloseRequest(Ptr<IpL4Protocol>);
-	virtual void Closed(Ptr<IpL4Protocol>);
+	virtual void Receive(Ptr<Socket>, uint32_t); // Data received
+	virtual void DataSend(Ptr<Socket>, uint32_t); 
+	virtual void ConnectionSucceeded(Ptr<Socket>);
+	virtual void ConnectionFailed(Ptr<Socket>);
+	virtual void CloseRequest(Ptr<Socket>);
 
  private:
 	static uint32_t  totalinfected;    // keeps count of total infected instances
 	static uint32_t  totalvulnerable;  // keeps count of total vulnerable instances
 	static uint32_t  totalinstances;
+        static uint32_t  scan_range;
 
 	WormTargetVector *targetV;
 	static WormTargetVector *defaultTV;
@@ -54,8 +55,7 @@ protected:
 public:
 
 	Worm(); // Constructor.
-	void SetNode (Ptr<Node> node); // Note which node attached to
-	Ptr<Node> GetNode () const;	
+	void SetNode (Ptr<Node> arg_node); // Note which node attached to
 	virtual ~Worm() {};
 	virtual Ptr<Application> Copy() const = 0;// Make a copy of the application
 	virtual void DoInitialize(void);
@@ -68,9 +68,9 @@ public:
 	static void SetInfectionPort(uint16_t);
 	static void SetTargetVector(const WormTargetVector &);
 	static void SetSignature(std::string s);
-	static uint32_t  TotalInfected() {return totalinfected;};
-	static uint32_t  TotalVulnerable() {return totalvulnerable;};
-	static uint32_t  TotalInstances() {return totalinstances;};
-	void SetStartTime (Time start);
-	void SetStopTime (Time stop);	
+	static uint32_t  TotalInfected() ;
+	static uint32_t  TotalVulnerable() ;
+	static uint32_t  TotalInstances() ;
+	//void SetStartTime (Time start);
+	//void SetStopTime (Time stop);	
 }
