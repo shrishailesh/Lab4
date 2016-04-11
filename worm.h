@@ -6,9 +6,11 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/node.h"
 #include "ns3/packet.h"
-#include "socket.h"
+#include "ns3/socket.h"
 #include "WormTargetVector.h"
 #include "ns3/ptr.h"
+#include "ns3/double.h"
+#include "ns3/ipv4.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -27,7 +29,7 @@ protected:
 	static std::string signature;    // signature string that is sent in packets
 	static char* wormdata;           // the contents of the worm  (this is sent usually sent)
 
-	Ip4vAddress GenerateNextIPAddress();
+	Ipv4Address GenerateNextIPAddress();
 	bool PacketIsWorm(Ptr<Packet>);   // I am going to use this to check if packet is a worm
 	virtual void PrepareWormData(char *&);
 	virtual void Activate();
@@ -57,7 +59,7 @@ public:
 	Worm(); // Constructor.
 	void SetNode (Ptr<Node> arg_node); // Note which node attached to
 	virtual ~Worm() {};
-	virtual Ptr<Application> Copy() const = 0;// Make a copy of the application
+	virtual Ptr<Application> Copy() const;// Make a copy of the application
 	virtual void DoInitialize(void);
 	void Infect();
 	bool IsInfected();
@@ -73,4 +75,6 @@ public:
 	static uint32_t  TotalInstances() ;
 	//void SetStartTime (Time start);
 	//void SetStopTime (Time stop);	
-}
+};
+
+#endif

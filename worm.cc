@@ -5,10 +5,12 @@ This is the implementation for worm.
 #include "worm.h"
 
 using namespace std;
+using namespace ns3;
 
 #define DEFAULTSCANRANGE 65536
 
 bool     Worm::initialized = false;
+uint32_t Worm::scan_range = DEFAULTSCANRANGE; 
 // this is for setting vulnerabilities
 Ptr<UniformRandomVariable> Worm::randVar = NULL;
 uint32_t Worm::payloadlength = 376;
@@ -17,7 +19,7 @@ uint16_t Worm::infectionport = 1434;
 // for making host's vulnerability be selected randomly
 double Worm::vulnerability = 1.0;
 
-Ipv4Address Worm::baseIP.SetBase ("10.1.0.0", "255.255.0.0");
+Ipv4Address Worm::baseIP("10.1.0.0");
 
 uint32_t  Worm::totalinfected = 0;
 uint32_t  Worm::totalvulnerable = 0;
@@ -89,7 +91,7 @@ void Worm::SetNode(Ptr<Node> arg_node) {
     node = arg_node;
     totalinstances ++;
     if (vulnerability != 1.0) {
-	vulnerable = (randvar->GetValue()) <= vulnerability;
+	vulnerable = (randVar->GetValue()) <= vulnerability;
     }
     if (vulnerable) {
 	totalvulnerable++;
@@ -112,7 +114,7 @@ void Worm::Activate() {
     //Yet to be decided. Usually overrided in wormudp and wormtcp
 }
 
-void Worm::Initialize() {
+void Worm::DoInitialize() {
     Application::DoInitialize();
 }
 
@@ -160,29 +162,27 @@ uint32_t Worm::TotalInstances() {
     return totalinstances;
 }
 
-void Worm::StartApplication (void) {
+void Worm::StartApplication (void) {    
     if (infected) {
 	Activate();
     }
     started = true;
-    Application::StartApplication (void) ;
+    //Application::StartApplication ();
 }
 
 void Worm::StopApplication (void) {
     started = false;
-    Application::StopApplication(void);
+    //Application::StopApplication ();
 }
 
 Ipv4Address Worm::GenerateNextIPAddress() {
     Ipv4Address IP;
     if (!targetV) {
     	targetV = defaultTV->Copy();
-	Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-        Ipv4Address addr = ipv4->GetAddress(1,0);
+	//Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
+        //Ipv4Address addr = (Ipv4Address)(ipv4->GetAddress(1,0));
     }
 
-    IP = baseIP + targetV->Generate();
+    IP.Set(baseIP.Get() + targetV->Generate());
     return IP;
-}
-    }
 }
