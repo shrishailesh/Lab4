@@ -6,18 +6,16 @@
 #include "worm.h"
 #include "ns3/ptr.h"
 #include "ns3/event-id.h"
-#include "socket.h"
-#include "tcp-socket-factory-impl.h"
+#include "ns3/socket.h"
+#include "ns3/tcp-socket-factory.h"
 #include "ns3/node.h"
+#include "ns3/address.h"
 
-#include <vector.h>
-#include <map.h>
+#include <vector>
+#include <map>
 
 using namespace std;
-{
-
-class Address;
-class TcpSocketFactoryImpl;
+using namespace ns3;
 
 class WormTCP : public Worm {
 
@@ -32,7 +30,7 @@ public:
 
 private:
 	std::vector< Ptr<Socket> >	m_tcp_ptr;
-	Ptr<TcpSocketFactoryImpl>	m_tcp;
+	Ptr<Socket>			m_tcp;
 	std::map < Ptr<Socket> ,int>	tcp_c_map;
 	std::map < Ptr<Socket> ,uint32_t>	tcp_recv;
 	std::map < Ptr<Socket> ,bool>	tcp_connected;
@@ -56,7 +54,5 @@ private:
 	virtual void StartApplication (void);
 	virtual void StopApplication (void);
 };
-
-}
 
 #endif

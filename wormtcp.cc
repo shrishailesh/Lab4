@@ -1,8 +1,8 @@
-#include "wormtcp.h"
-#include "socket-factory.h"
-#include "socket.h"
+#include "ns3/wormtcp.h"
+#include "ns3/socket-factory.h"
+#include "ns3/socket.h"
 #include "ns3/application.h"
-#include "ptr.h"
+#include "ns3/ptr.h"
 
 using namespace std;
 
@@ -10,10 +10,9 @@ Ptr<UniformRandomVariable>  WormTCP::rngD = NULL;
 uint16_t  WormTCP::connections = 2;
 
 WormTCP::WormTCP()
-  : m_socket (0),
-    m_totBytes (0),
-    m_connected (false)
+  : m_tcp(NULL)
 {
+	m_tcp_ptr.clear();
 	tcp_c_map.clear();
 	tcp_recv.clear();
 	tcp_is_worm.clear();
@@ -57,21 +56,21 @@ void WormTCP::SetNode (Ptr<Node> arg_node)
         	iaddr = ipv4->GetAddress (1,0);
         	addri = iaddr.GetLocal ();
 		temp_socket->Bind(InetSocketAddress(iaddr, infectionport));
-		m_socket.push_back(temp_socket);
+		tcp_m_ptr.push_back(temp_socket);
 		sentAck.push_back(0);
 		arg_node->AddApplication(this);
 		tcp_c_map[temp_socket]=i;
 		tcp_connected[temp_socket] = false;
-		temp_socket->Connect (m_peer);
-      		temp_socket->ShutdownRecv ();
-      		temp_socket->SetConnectCallback (
+		tcp_m_ptr[i]->Connect (m_peer);
+      		tcp_m_ptr[i]->ShutdownRecv ();
+      		tcp_m_ptr[i]->SetConnectCallback (
         		MakeCallback (&WormTCP::ConnectionSucceeded, this),
         		MakeCallback (&WormTCP::ConnectionFailed, this));
-      		temp_socket->SetSendCallback (
+      		tcp_m_ptr[i]->SetSendCallback (
         		MakeCallback (&WormTCP::DataSend, this));
-		temp_socket->SetRecvCallback (
+		tcp_m_ptr[i]->SetRecvCallback (
 			MakeCallback (&WormTCP::Receive, this));
-		m_socket->SetCloseCallbacks (
+		tcp_m_ptr[i]->SetCloseCallbacks (
     			MakeCallback (&PacketSink::CloseRequest, this),
     			MakeNullCallback<bool, Ptr<Socket> ());
 	}
@@ -103,14 +102,14 @@ void WormTCP::SendWorm(int threadno)
 { 
   m_peer.Set(baseIp.Get() + (GenerateNextIPAddress()).Get());
   
-  m_socket[threadno]->Connect(m_peer, infectionport);
+  tcp_m_ptr[threadno]->Connect(m_peer, infectionport);
   Ptr<Packet> packet = Create<Packet> (wormdata);
-  int actual = m_socket[threadno]->Send(packet);
+  int actual = tcp_m_ptr[threadno]->Send(packet);
 
   if(sentAck[threadno]>=payloadlength)
   {
-  	m_socket[threadno]->Close();
-  	tcp_connected[m_socket[threadno]]=false;
+  	tcp_m_ptr[threadno]->Close();
+  	tcp_connected[tcp_m_ptr[threadno]]=false;
   }
 
 }
@@ -119,7 +118,7 @@ void WormTCP::ConnectionSucceeded(Ptr<Socket> sock)
 {
   int threadno = tcp_c_map[sock];
   sentAck[threadno] = 0;
-  tcp_connected[m_socket[threadno]]=true;
+  tcp_connected[tcp_m_ptr[threadno]]=true;
   SendWorm(threadno);
 }
 
