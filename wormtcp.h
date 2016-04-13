@@ -9,7 +9,7 @@
 #include "ns3/socket.h"
 #include "ns3/tcp-socket-factory.h"
 #include "ns3/node.h"
-#include "ns3/address.h"
+#include "ns3/ipv4-address.h"
 
 #include <vector>
 #include <map>
@@ -27,6 +27,7 @@ public:
 	
 	static void SetConnections(uint16_t);
 	virtual void DoInitialize(void);
+	void Activate();
 
 private:
 	std::vector< Ptr<Socket> >	m_tcp_ptr;
@@ -36,7 +37,7 @@ private:
 	std::map < Ptr<Socket> ,bool>	tcp_connected;
 	std::map < Ptr<Socket> ,bool>	tcp_is_worm;
 	std::vector< uint32_t > 	sentAck;
-	Address         m_peer;
+	Ipv4Address         m_peer;
 	uint32_t        m_sendSize;
 
 	static Ptr<UniformRandomVariable> rngD;
@@ -45,14 +46,16 @@ private:
 
 	void SendWorm(int);
 
-	virtual void Receive(Ptr<Socket>, uint32_t); // Data received
-	virtual void DataSend(uint32_t , Ptr<Socket>); 
-	virtual void ConnectionComplete(Ptr<Socket>);
-	virtual void ConnectionFailed(Ptr<Socket>);
-	virtual void CloseRequest(Ptr<Socket>);
+	void StartApplication (void);
+	void StopApplication (void);
 
-	virtual void StartApplication (void);
-	virtual void StopApplication (void);
+protected:
+	void Receive(Ptr<Socket>); // Data received
+	void DataSend(Ptr<Socket>, uint32_t); 
+	void ConnectionSucceeded(Ptr<Socket>);
+	void ConnectionFailed(Ptr<Socket>);
+	void CloseRequest(Ptr<Socket>);
+
 };
 
 #endif
