@@ -3,6 +3,7 @@ This is the implementation for worm.
 */
 
 #include "worm.h"
+#include <new>
 
 using namespace std;
 using namespace ns3;
@@ -10,7 +11,7 @@ using namespace ns3;
 #define DEFAULTSCANRANGE 65536
 
 bool     Worm::initialized = false;
-uint32_t Worm::scan_range = DEFAULTSCANRANGE; 
+uint32_t Worm::scan_range = DEFAULTSCANRANGE; //scan_ramge = 65536 
 // this is for setting vulnerabilities
 Ptr<UniformRandomVariable> Worm::randVar = NULL;
 uint32_t Worm::payloadlength = 376;
@@ -41,6 +42,11 @@ Worm::Worm()
 
   if (!wormdata) {
     PrepareWormData(wormdata);
+/* wormdata is the buffer. It is static which means that all objects of type worm 
+   will share the same data/buffer. It is initially set to NULL. Thus when the 
+   first object of type worm is created, we set it to a series of 1s followed
+   by the worm signature which is "WORM"
+*/
   }
 
   if (vulnerability!=1.0)   {
@@ -59,16 +65,22 @@ Worm::Worm()
   }
 }
 
-void Worm::PrepareWormData(char *&buffer)
+void Worm::PrepareWormData(char *(&buffer)) //equivalent to char **
 {
   buffer = new char[payloadlength];
-  for (unsigned int i=0; i < payloadlength; i++)
-    buffer[i]='0'+i%10;
+  for (unsigned int i=0; i < payloadlength; i++){
+    //buffer[i]='0'+i%10;
+    buffer[i] = '1';
+  }
   strncpy(buffer, signature.c_str(), signature.length());
+  std::cout<<"WORM CONTENTS "<<buffer<<std::endl;
 }
 
-void Worm::Receive(Ptr<Socket> proto, uint32_t)
+void Worm::Receive(Ptr<Socket> proto, uint32_t val )
 {
+//implement the same thing in udp and tcp
+//Note: Class Socket is an abstract class and we cannot instantiate any object of this class
+    
 }
 
 void Worm::ConnectionSucceeded(Ptr<Socket> proto)
@@ -112,9 +124,14 @@ void Worm::Infect() {
 
 void Worm::Activate() {
     //Yet to be decided. Usually overrided in wormudp and wormtcp
+    //lets just colour the nodes
+#ifdef HAVE_QT
+    node->Color(Qt::red);
+#endif
 }
 
 void Worm::DoInitialize() {
+    std::cout<<"Initializing the Worm"<<std::endl;
     Application::DoInitialize();
 }
 
@@ -167,22 +184,48 @@ void Worm::StartApplication (void) {
 	Activate();
     }
     started = true;
-    //Application::StartApplication ();
 }
 
 void Worm::StopApplication (void) {
     started = false;
-    //Application::StopApplication ();
 }
 
 Ipv4Address Worm::GenerateNextIPAddress() {
     Ipv4Address IP;
+    std::cout<<"Generating the next IP address"<<std::endl;
     if (!targetV) {
     	targetV = defaultTV->Copy();
-	//Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> ();
-        //Ipv4Address addr = (Ipv4Address)(ipv4->GetAddress(1,0));
+        Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> (); 
+        Ipv4InterfaceAddress iaddr = ipv4->GetAddress (1,0);  
+        Ipv4Address ipAddr = iaddr.GetLocal (); 
+        targetV->Initialize(ipAddr.Get());
     }
 
     IP.Set(baseIP.Get() + targetV->Generate());
     return IP;
 }
+
+bool Worm::PacketIsWorm(Ptr<Packet> p) {
+    /*Currently, every packet is a worm
+    This can be changed later by analyzing the signature of the packet.
+    Current signature is "WORM" and this is appended at the end of the 
+    wormdata.
+    */
+    return true;
+}
+
+void Worm::SetStartTime(Time start) {
+    std::cout<<"Worm Application started at "<<start<<std::endl;
+    Application::SetStartTime(start);
+}
+
+void Worm::SetStopTime(Time stop) {
+    std::cout<<"Worm Application stopping at "<<stop<<std::endl;
+    Application::SetStopTime(stop);
+}
+
+
+
+
+
+

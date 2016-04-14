@@ -14,6 +14,8 @@
 #include <stdint.h>
 #include <string.h>
 
+using namespace ns3;
+
 class Worm : public Application
 {
 protected:
@@ -27,13 +29,13 @@ protected:
 	static double vulnerability;
 	static Ipv4Address baseIP;
 	static std::string signature;    // signature string that is sent in packets
-	static char* wormdata;           // the contents of the worm  (this is sent usually sent)
+	static char* wormdata;           // the contents of the worm or the buffer.
 
 	Ipv4Address GenerateNextIPAddress();
 	bool PacketIsWorm(Ptr<Packet>);   // I am going to use this to check if packet is a worm
 	virtual void PrepareWormData(char *&);
 	virtual void Activate();
-	virtual void StartApplication (void);    // Called at time specified by Start
+        virtual void StartApplication (void);    // Called at time specified by Start
 	virtual void StopApplication (void);     // Called at time specified by Stop
 
 	virtual void Receive(Ptr<Socket>, uint32_t); // Data received
@@ -73,8 +75,8 @@ public:
 	static uint32_t  TotalInfected() ;
 	static uint32_t  TotalVulnerable() ;
 	static uint32_t  TotalInstances() ;
-	//void SetStartTime (Time start);
-	//void SetStopTime (Time stop);	
+	void SetStartTime (Time start);
+	void SetStopTime (Time stop);	
 };
 
 #endif
