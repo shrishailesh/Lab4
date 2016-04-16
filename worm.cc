@@ -34,6 +34,7 @@ WormTargetVector* Worm::defaultTV = NULL;
 Worm::Worm()
   : infected(false), vulnerable(true), started(false), node(NULL), targetV(NULL)
 {
+  cout << "Inside Worm Constructor." << endl;
 
   if (!initialized) {
     DoInitialize();
@@ -52,6 +53,8 @@ Worm::Worm()
   if (vulnerability!=1.0)   {
     if (!randVar) 
 	{
+		cout << "Inside vulnerability" << endl;
+		
 		randVar = CreateObject<UniformRandomVariable> ();
 		randVar-> SetAttribute ("Min", DoubleValue(0.0));
     		randVar-> SetAttribute ("Max", DoubleValue(1.0));
@@ -67,6 +70,8 @@ Worm::Worm()
 
 void Worm::PrepareWormData(char *(&buffer)) //equivalent to char **
 {
+  cout << "Inside PrepareWormData" << endl;
+
   buffer = new char[payloadlength];
   for (unsigned int i=0; i < payloadlength; i++){
     //buffer[i]='0'+i%10;
@@ -100,6 +105,9 @@ void Worm::CloseRequest(Ptr<Socket> proto)
 }
 
 void Worm::SetNode(Ptr<Node> arg_node) {
+
+    cout << "Inside Worm set node. " << endl;
+
     node = arg_node;
     totalinstances ++;
     if (vulnerability != 1.0) {
@@ -115,8 +123,17 @@ Ptr<Application> Worm::Copy() const {
 }
 
 void Worm::Infect() {
+
+    if(infected)
+	return;
+
+    cout << "Inside Worm infect(). " << endl;
+
     infected = true;
     totalinfected++;
+
+    cout << "Worm:TotalInfected = " <<  totalinfected << endl;
+
     if (started) {
 	Activate();
     }
@@ -125,6 +142,9 @@ void Worm::Infect() {
 void Worm::Activate() {
     //Yet to be decided. Usually overrided in wormudp and wormtcp
     //lets just colour the nodes
+
+    cout << "Inside Worm Activate(). " << endl;
+
 #ifdef HAVE_QT
     node->Color(Qt::red);
 #endif
@@ -179,7 +199,10 @@ uint32_t Worm::TotalInstances() {
     return totalinstances;
 }
 
-void Worm::StartApplication (void) {    
+void Worm::StartApplication (void) {
+
+    cout << "Entering WORM StartApplication()" << endl;
+    
     if (infected) {
 	Activate();
     }
@@ -194,14 +217,25 @@ Ipv4Address Worm::GenerateNextIPAddress() {
     Ipv4Address IP;
     std::cout<<"Generating the next IP address"<<std::endl;
     if (!targetV) {
+	cout << "No target vector."<<endl;
     	targetV = defaultTV->Copy();
+	//cout << "1"<<endl;
         Ptr<Ipv4> ipv4 = node->GetObject<Ipv4> (); 
-        Ipv4InterfaceAddress iaddr = ipv4->GetAddress (1,0);  
-        Ipv4Address ipAddr = iaddr.GetLocal (); 
+	//cout << "2"<<endl;        
+	Ipv4InterfaceAddress iaddr = ipv4->GetAddress (1,0);
+	//cout << "3"<<endl;  
+        Ipv4Address ipAddr = iaddr.GetLocal ();
+	
+	cout << "Raw form = " << ipAddr << " ,uint32_t form =" << ipAddr.Get() << endl; 
         targetV->Initialize(ipAddr.Get());
     }
 
+    //cout <<baseIP.Get() << endl;
+    //cout <<targetV->Generate() << endl;
+
     IP.Set(baseIP.Get() + targetV->Generate());
+
+    //cout << IP.Get() << endl;
     return IP;
 }
 

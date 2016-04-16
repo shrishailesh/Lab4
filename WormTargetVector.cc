@@ -1,4 +1,5 @@
 #include "WormTargetVector.h"
+#include "ns3/double.h"
 
 using namespace std;
 
@@ -21,8 +22,9 @@ WormTargetVector* WormTargetVector::Copy() const
 
 void WormTargetVector::Initialize(uint32_t IP)
 {
-  //cout<<"Initialize called"<<endl;
+  cout<<"Initialize called"<<endl;
   localIP->Set(IP);
+  //cout << "IP Set" << endl;
   initialized = true;
 }
 
@@ -35,6 +37,7 @@ uint32_t WormTargetVector::Generate()
 
 WTVUniform::WTVUniform(uint32_t scanrange) : WormTargetVector(scanrange)
 {
+  Initialize(IPADDR_NONE);
 }
 
 WormTargetVector* WTVUniform::Copy() const
@@ -47,8 +50,8 @@ void WTVUniform::Initialize(uint32_t IP)
   WormTargetVector::Initialize(IP);
 
   randGen = CreateObject<UniformRandomVariable> ();
-  randGen-> SetAttribute ("Min", IntegerValue(0.0));
-  randGen-> SetAttribute ("Max", IntegerValue(scanrange));
+  randGen-> SetAttribute ("Min", DoubleValue(0.0));
+  randGen-> SetAttribute ("Max", DoubleValue(scanrange));
 }
 
 uint32_t WTVUniform::Generate()
